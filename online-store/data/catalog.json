@@ -1,0 +1,27 @@
+[
+    {
+        "itemId"   : "I001",
+        "name" : "apple",
+        "unitPrice": 10
+    },
+    {
+        "itemId"   : "I002",
+        "name" : "banana",
+        "unitPrice": 5
+    },
+    {
+        "itemId"   : "I003",
+        "name" : "cherry",
+        "unitPrice": 15
+    },
+    {
+        "itemId"   : "I004",
+        "name" : "mango",
+        "unitPrice": 20
+    },
+    {
+        "itemId"   : "I005",
+        "name" : "orange",
+        "unitPrice": 7
+    }
+]

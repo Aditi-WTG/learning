@@ -1,0 +1,54 @@
+[
+    {
+        "orderId": "ORD001",
+        "customerId": "C001",
+        "items": [
+            {
+                "itemId": "I001",
+                "quantity": 2
+            },
+            {
+                "itemId": "I004",
+                "quantity": 5
+            }
+        ],
+        "destination": "des1",
+        "date": "2023-01-15"
+    },
+    {
+        "orderId": "ORD002",
+        "customerId": "C002",
+        "items": [
+            {
+                "itemId": "I002",
+                "quantity": 3
+            }
+        ],
+        "destination": "des2",
+        "date": "2023-01-16"
+    },
+    {
+        "orderId": "ORD003",
+        "customerId": "C003",
+        "items": [
+            {
+                "itemId": "I003",
+                "quantity": 1
+            },
+            {
+                "itemId": "I001",
+                "quantity": 2
+            },
+            {
+                "itemId": "I002",
+                "quantity": 4
+            },
+            {
+                "itemId": "I005",
+                "quantity": 9
+            }
+        ],
+        "destination": "des3",
+        "date": "2023-01-17"
+    }
+]
