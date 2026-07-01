@@ -4,17 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"online-store/models"
+	"path/filepath"
 	"sort"
 )
 
 func main() {
 
-	orders, err := Load[models.Order]("data\\orders.json")
+	orders, err := Load[models.Order](filepath.Join("data", "orders.json"))
 	if err != nil {
 		panic("Error loading the orders: " + err.Error())
 	}
 
-	catalog, err := Load[models.Item]("data\\catalog.json")
+	catalog, err := Load[models.Item](filepath.Join("data", "catalog.json"))
 	if err != nil {
 		panic("Error loading the catalog: " + err.Error())
 	}

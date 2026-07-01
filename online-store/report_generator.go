@@ -6,7 +6,7 @@ func generateReport(uniqueOrders []models.Order, duplicateOrders []models.Order,
 
 	report := models.NewShippingReport()
 
-	report.TotalOrders = len(uniqueOrders)
+	report.TotalOrders = len(uniqueOrders) + len(duplicateOrders)
 	report.DuplicateOrders = len(duplicateOrders)
 
 	for _, order := range uniqueOrders {
