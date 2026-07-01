@@ -1,9 +1,8 @@
-package main
+package reporting
 
 import "online-store/models"
 
-func generateReport(uniqueOrders []models.Order, duplicateOrders []models.Order, catalogMap map[string]models.Item) models.ShippingReport {
-
+func GenerateReport(uniqueOrders []models.Order, duplicateOrders []models.Order, catalogMap map[string]models.Item) models.ShippingReport {
 	report := models.NewShippingReport()
 
 	report.TotalOrders = len(uniqueOrders) + len(duplicateOrders)
@@ -11,7 +10,6 @@ func generateReport(uniqueOrders []models.Order, duplicateOrders []models.Order,
 
 	for _, order := range uniqueOrders {
 		for _, orderItem := range order.Items {
-
 			item := catalogMap[orderItem.ItemID]
 
 			report.TotalCost += float64(orderItem.Quantity) * item.UnitPrice

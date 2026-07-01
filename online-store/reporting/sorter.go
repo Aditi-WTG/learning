@@ -1,4 +1,4 @@
-package main
+package reporting
 
 import (
 	"online-store/models"
@@ -6,9 +6,7 @@ import (
 )
 
 func Sort(orders []models.Order) {
-
 	sort.Slice(orders, func(i, j int) bool {
-
 		if orders[i].Date != orders[j].Date {
 			return orders[i].Date < orders[j].Date
 		}

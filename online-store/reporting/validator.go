@@ -1,4 +1,4 @@
-package main
+package reporting
 
 import (
 	"fmt"
@@ -20,7 +20,6 @@ func Validate(order models.Order, catalogMap map[string]models.Item) error {
 	}
 
 	for _, orderItem := range order.Items {
-
 		if orderItem.Quantity <= 0 {
 			return fmt.Errorf("Invalid Order Item Quantity")
 		}
