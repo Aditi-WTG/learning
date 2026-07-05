@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package store.v1;
+
+option go_package = "server-client/proto/storepb";
+
+service EventBus {
+    rpc Publish(PublishRequest) returns (PublishAck);
+    rpc Subscribe(SubscribeRequest) returns (stream Message);
+}
+
+message PublishRequest {
+    string topic = 1;
+    string body = 2;
+}
+
+message PublishAck {
+    string id = 1;
+}
+
+message SubscribeRequest {
+    string topic = 1;
+}
+
+message Message {
+    string id = 1;
+    string topic = 2;
+    string body = 3;
+}
