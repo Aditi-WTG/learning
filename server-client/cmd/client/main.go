@@ -49,7 +49,6 @@ func main() {
 }
 
 func publish(client storepb.EventBusClient, topic string, message string) {
-	log.Printf("DEBUG topic=%q message=%q", topic, message)
 	if message == "" {
 		log.Fatal("flag - message is required")
 	}

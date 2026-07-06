@@ -1,7 +1,7 @@
 PROTO_DIR := proto
 OUT_DIR   := pb
 
-.PHONY: proto server publisher consumer clean
+.PHONY: proto build server order duplicate reports clean
 
 proto:
 	protoc \
@@ -10,14 +10,20 @@ proto:
 		--go-grpc_out=$(OUT_DIR) --go-grpc_opt=paths=source_relative \
 		$(PROTO_DIR)/store.proto
 
+build:
+	go build ./...
+
 server:
-	go run ./server
+	go run ./cmd/server
 
-publisher:
-	go run ./publisher
+reports:
+	go run ./cmd/client -mode=sub -topic=report.daily
 
-consumer:
-	go run ./consumer
+order:
+	go run ./cmd/client -mode=pub -topic=order.created -message='{"orderId":"O1001","customerId":"C001","items":[{"itemId":"I001","quantity":2}],"destination":"Mumbai","date":"2026-07-06"}'
+
+duplicate:
+	go run ./cmd/client -mode=pub -topic=order.created -message='{"orderId":"O1001","customerId":"C001","items":[{"itemId":"I001","quantity":2}],"destination":"Mumbai","date":"2026-07-06"}'
 
 clean:
 	rm -f $(OUT_DIR)/*.pb.go $(OUT_DIR)/*_grpc.pb.go
