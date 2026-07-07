@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 	"server-client/internal/broker"
 	"server-client/internal/models"
 	"server-client/internal/reporting"
@@ -43,7 +44,7 @@ func main() {
 }
 
 func loadCatalog() ([]models.Item, error) {
-	data, err := os.ReadFile("../online-store/data/catalog.json")
+	data, err := os.ReadFile(filepath.Join("data", "catalog.json"))
 	if err != nil {
 		return nil, err
 	}
