@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"io"
 	"log"
@@ -15,6 +16,7 @@ import (
 func main() {
 	mode := flag.String("mode", "", "pub or sub")
 	topic := flag.String("topic", "", "topic name")
+	date := flag.String("date", "", "report date in YYYY-MM-DD (for report mode)")
 	addr := flag.String("addr", "localhost:50053", "server address")
 	message := flag.String("message", "", "message body (for publisher)")
 	flag.Parse()
@@ -23,7 +25,7 @@ func main() {
 		log.Fatal("flag - mode is required")
 	}
 
-	if *topic == "" {
+	if *topic == "" && *mode != "report" && *mode != "report-all" {
 		log.Fatal("flag - topic is required")
 	}
 
@@ -43,6 +45,10 @@ func main() {
 		publish(client, *topic, *message)
 	case "sub":
 		subscribe(client, *topic)
+	case "report":
+		getReportByDate(client, *date)
+	case "report-all":
+		getAllReports(client)
 	default:
 		log.Fatalf("invalid mode: %s", *mode)
 	}
@@ -92,4 +98,42 @@ func subscribe(client storepb.EventBusClient, topic string) {
 
 		log.Printf("Topic: %s, Message: %s\n", msg.Topic, msg.Body)
 	}
+}
+
+func getReportByDate(client storepb.EventBusClient, date string) {
+	if date == "" {
+		log.Fatal("flag - date is required for report mode")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := client.GetReportByDate(ctx, &storepb.GetReportByDateRequest{Date: date})
+	if err != nil {
+		log.Fatalf("get report failed: %v", err)
+	}
+
+	formatted, err := json.MarshalIndent(resp.GetReport(), "", "  ")
+	if err != nil {
+		log.Fatalf("failed to format report: %v", err)
+	}
+
+	log.Println(string(formatted))
+}
+
+func getAllReports(client storepb.EventBusClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	resp, err := client.GetAllReports(ctx, &storepb.GetAllReportsRequest{})
+	if err != nil {
+		log.Fatalf("get all reports failed: %v", err)
+	}
+
+	formatted, err := json.MarshalIndent(resp.GetReports(), "", "  ")
+	if err != nil {
+		log.Fatalf("failed to format reports: %v", err)
+	}
+
+	log.Println(string(formatted))
 }

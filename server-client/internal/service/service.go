@@ -45,28 +45,26 @@ func (s *EventBusService) Publish(ctx context.Context, req *storepb.PublishReque
 
 	id := fmt.Sprintf("%d", time.Now().UnixNano())
 
-	msg := &storepb.Message{
-		Id:    id,
-		Topic: topic,
-		Body:  body,
+	if topic != topicOrderCreated {
+		return nil, status.Errorf(codes.InvalidArgument, "unsupported topic: %s", topic)
 	}
 
-	s.b.Publish(topic, msg)
+	if s.aggregator == nil {
+		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
+	}
 
-	if topic == topicOrderCreated && s.aggregator != nil {
-		var order models.Order
-		if err := json.Unmarshal([]byte(body), &order); err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid %s payload: %v", topicOrderCreated, err)
-		}
+	var order models.Order
+	if err := json.Unmarshal([]byte(body), &order); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid %s payload: %v", topicOrderCreated, err)
+	}
 
-		report, err := s.aggregator.ProcessOrder(order)
-		if err != nil {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid order: %v", err)
-		}
+	report, err := s.aggregator.ProcessOrder(order)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid order: %v", err)
+	}
 
-		if err := s.publishDailyReportEvent(id, report); err != nil {
-			return nil, err
-		}
+	if err := s.publishDailyReportEvent(id, report); err != nil {
+		return nil, err
 	}
 
 	return &storepb.PublishAck{Id: id}, nil
@@ -104,6 +102,38 @@ func (s *EventBusService) Subscribe(req *storepb.SubscribeRequest, stream grpc.S
 	}
 }
 
+func (s *EventBusService) GetReportByDate(ctx context.Context, req *storepb.GetReportByDateRequest) (*storepb.GetReportByDateResponse, error) {
+	if s.aggregator == nil {
+		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
+	}
+
+	date := strings.TrimSpace(req.GetDate())
+	if date == "" {
+		return nil, status.Error(codes.InvalidArgument, "date is required")
+	}
+
+	report, ok := s.aggregator.Snapshot(date)
+	if !ok {
+		return nil, status.Error(codes.NotFound, "report not found for date")
+	}
+
+	return &storepb.GetReportByDateResponse{Report: toProtoReport(report)}, nil
+}
+
+func (s *EventBusService) GetAllReports(ctx context.Context, req *storepb.GetAllReportsRequest) (*storepb.GetAllReportsResponse, error) {
+	if s.aggregator == nil {
+		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
+	}
+
+	all := s.aggregator.SnapshotAll()
+	reports := make([]*storepb.Report, 0, len(all))
+	for _, report := range all {
+		reports = append(reports, toProtoReport(report))
+	}
+
+	return &storepb.GetAllReportsResponse{Reports: reports}, nil
+}
+
 func (s *EventBusService) publishDailyReportEvent(baseID string, report models.ShippingReport) error {
 	reportBody, err := json.Marshal(report)
 	if err != nil {
@@ -117,4 +147,40 @@ func (s *EventBusService) publishDailyReportEvent(baseID string, report models.S
 	})
 
 	return nil
+}
+
+func toProtoReport(report models.ShippingReport) *storepb.Report {
+	items := make(map[string]*storepb.ItemSummary, len(report.Items))
+	for itemID, summary := range report.Items {
+		items[itemID] = &storepb.ItemSummary{
+			Name:     summary.Name,
+			Quantity: int32(summary.Quantity),
+		}
+	}
+
+	ordersByDestination := make(map[string]int32, len(report.OrdersByDestination))
+	for destination, count := range report.OrdersByDestination {
+		ordersByDestination[destination] = int32(count)
+	}
+
+	ordersByCustomer := make(map[string]int32, len(report.OrdersByCustomer))
+	for customerID, count := range report.OrdersByCustomer {
+		ordersByCustomer[customerID] = int32(count)
+	}
+
+	duplicateOrdersByCustomer := make(map[string]int32, len(report.DuplicateOrdersByCustomer))
+	for customerID, count := range report.DuplicateOrdersByCustomer {
+		duplicateOrdersByCustomer[customerID] = int32(count)
+	}
+
+	return &storepb.Report{
+		Date:                      report.Date,
+		TotalOrders:               int32(report.TotalOrders),
+		TotalCost:                 report.TotalCost,
+		Items:                     items,
+		OrdersByDestination:       ordersByDestination,
+		DuplicateOrders:           int32(report.DuplicateOrders),
+		OrdersByCustomer:          ordersByCustomer,
+		DuplicateOrdersByCustomer: duplicateOrdersByCustomer,
+	}
 }

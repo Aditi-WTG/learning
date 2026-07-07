@@ -7,6 +7,8 @@ option go_package = "server-client/proto/storepb";
 service EventBus {
     rpc Publish(PublishRequest) returns (PublishAck);
     rpc Subscribe(SubscribeRequest) returns (stream Message);
+    rpc GetReportByDate(GetReportByDateRequest) returns (GetReportByDateResponse);
+    rpc GetAllReports(GetAllReportsRequest) returns (GetAllReportsResponse);
 }
 
 message PublishRequest {
@@ -26,4 +28,34 @@ message Message {
     string id = 1;
     string topic = 2;
     string body = 3;
+}
+
+message GetReportByDateRequest {
+    string date = 1;
+}
+
+message GetReportByDateResponse {
+    Report report = 1;
+}
+
+message GetAllReportsRequest {}
+
+message GetAllReportsResponse {
+    repeated Report reports = 1;
+}
+
+message ItemSummary {
+    string name = 1;
+    int32 quantity = 2;
+}
+
+message Report {
+    string date = 1;
+    int32 total_orders = 2;
+    double total_cost = 3;
+    map<string, ItemSummary> items = 4;
+    map<string, int32> orders_by_destination = 5;
+    int32 duplicate_orders = 6;
+    map<string, int32> orders_by_customer = 7;
+    map<string, int32> duplicate_orders_by_customer = 8;
 }

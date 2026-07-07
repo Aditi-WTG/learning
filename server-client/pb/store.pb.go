@@ -221,6 +221,326 @@ func (x *Message) GetBody() string {
 	return ""
 }
 
+type GetReportByDateRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetReportByDateRequest) Reset() {
+	*x = GetReportByDateRequest{}
+	mi := &file_store_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetReportByDateRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetReportByDateRequest) ProtoMessage() {}
+
+func (x *GetReportByDateRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetReportByDateRequest.ProtoReflect.Descriptor instead.
+func (*GetReportByDateRequest) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetReportByDateRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+type GetReportByDateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Report        *Report                `protobuf:"bytes,1,opt,name=report,proto3" json:"report,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetReportByDateResponse) Reset() {
+	*x = GetReportByDateResponse{}
+	mi := &file_store_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetReportByDateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetReportByDateResponse) ProtoMessage() {}
+
+func (x *GetReportByDateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetReportByDateResponse.ProtoReflect.Descriptor instead.
+func (*GetReportByDateResponse) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetReportByDateResponse) GetReport() *Report {
+	if x != nil {
+		return x.Report
+	}
+	return nil
+}
+
+type GetAllReportsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllReportsRequest) Reset() {
+	*x = GetAllReportsRequest{}
+	mi := &file_store_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllReportsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllReportsRequest) ProtoMessage() {}
+
+func (x *GetAllReportsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllReportsRequest.ProtoReflect.Descriptor instead.
+func (*GetAllReportsRequest) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{6}
+}
+
+type GetAllReportsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Reports       []*Report              `protobuf:"bytes,1,rep,name=reports,proto3" json:"reports,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAllReportsResponse) Reset() {
+	*x = GetAllReportsResponse{}
+	mi := &file_store_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAllReportsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAllReportsResponse) ProtoMessage() {}
+
+func (x *GetAllReportsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAllReportsResponse.ProtoReflect.Descriptor instead.
+func (*GetAllReportsResponse) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetAllReportsResponse) GetReports() []*Report {
+	if x != nil {
+		return x.Reports
+	}
+	return nil
+}
+
+type ItemSummary struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Quantity      int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ItemSummary) Reset() {
+	*x = ItemSummary{}
+	mi := &file_store_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ItemSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ItemSummary) ProtoMessage() {}
+
+func (x *ItemSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ItemSummary.ProtoReflect.Descriptor instead.
+func (*ItemSummary) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ItemSummary) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ItemSummary) GetQuantity() int32 {
+	if x != nil {
+		return x.Quantity
+	}
+	return 0
+}
+
+type Report struct {
+	state                     protoimpl.MessageState  `protogen:"open.v1"`
+	Date                      string                  `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	TotalOrders               int32                   `protobuf:"varint,2,opt,name=total_orders,json=totalOrders,proto3" json:"total_orders,omitempty"`
+	TotalCost                 float64                 `protobuf:"fixed64,3,opt,name=total_cost,json=totalCost,proto3" json:"total_cost,omitempty"`
+	Items                     map[string]*ItemSummary `protobuf:"bytes,4,rep,name=items,proto3" json:"items,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	OrdersByDestination       map[string]int32        `protobuf:"bytes,5,rep,name=orders_by_destination,json=ordersByDestination,proto3" json:"orders_by_destination,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	DuplicateOrders           int32                   `protobuf:"varint,6,opt,name=duplicate_orders,json=duplicateOrders,proto3" json:"duplicate_orders,omitempty"`
+	OrdersByCustomer          map[string]int32        `protobuf:"bytes,7,rep,name=orders_by_customer,json=ordersByCustomer,proto3" json:"orders_by_customer,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	DuplicateOrdersByCustomer map[string]int32        `protobuf:"bytes,8,rep,name=duplicate_orders_by_customer,json=duplicateOrdersByCustomer,proto3" json:"duplicate_orders_by_customer,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
+}
+
+func (x *Report) Reset() {
+	*x = Report{}
+	mi := &file_store_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Report) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Report) ProtoMessage() {}
+
+func (x *Report) ProtoReflect() protoreflect.Message {
+	mi := &file_store_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Report.ProtoReflect.Descriptor instead.
+func (*Report) Descriptor() ([]byte, []int) {
+	return file_store_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *Report) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *Report) GetTotalOrders() int32 {
+	if x != nil {
+		return x.TotalOrders
+	}
+	return 0
+}
+
+func (x *Report) GetTotalCost() float64 {
+	if x != nil {
+		return x.TotalCost
+	}
+	return 0
+}
+
+func (x *Report) GetItems() map[string]*ItemSummary {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+func (x *Report) GetOrdersByDestination() map[string]int32 {
+	if x != nil {
+		return x.OrdersByDestination
+	}
+	return nil
+}
+
+func (x *Report) GetDuplicateOrders() int32 {
+	if x != nil {
+		return x.DuplicateOrders
+	}
+	return 0
+}
+
+func (x *Report) GetOrdersByCustomer() map[string]int32 {
+	if x != nil {
+		return x.OrdersByCustomer
+	}
+	return nil
+}
+
+func (x *Report) GetDuplicateOrdersByCustomer() map[string]int32 {
+	if x != nil {
+		return x.DuplicateOrdersByCustomer
+	}
+	return nil
+}
+
 var File_store_proto protoreflect.FileDescriptor
 
 const file_store_proto_rawDesc = "" +
@@ -237,10 +557,45 @@ const file_store_proto_rawDesc = "" +
 	"\aMessage\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05topic\x18\x02 \x01(\tR\x05topic\x12\x12\n" +
-	"\x04body\x18\x03 \x01(\tR\x04body2\x83\x01\n" +
+	"\x04body\x18\x03 \x01(\tR\x04body\",\n" +
+	"\x16GetReportByDateRequest\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\"C\n" +
+	"\x17GetReportByDateResponse\x12(\n" +
+	"\x06report\x18\x01 \x01(\v2\x10.store.v1.ReportR\x06report\"\x16\n" +
+	"\x14GetAllReportsRequest\"C\n" +
+	"\x15GetAllReportsResponse\x12*\n" +
+	"\areports\x18\x01 \x03(\v2\x10.store.v1.ReportR\areports\"=\n" +
+	"\vItemSummary\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
+	"\bquantity\x18\x02 \x01(\x05R\bquantity\"\x8f\x06\n" +
+	"\x06Report\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12!\n" +
+	"\ftotal_orders\x18\x02 \x01(\x05R\vtotalOrders\x12\x1d\n" +
+	"\n" +
+	"total_cost\x18\x03 \x01(\x01R\ttotalCost\x121\n" +
+	"\x05items\x18\x04 \x03(\v2\x1b.store.v1.Report.ItemsEntryR\x05items\x12]\n" +
+	"\x15orders_by_destination\x18\x05 \x03(\v2).store.v1.Report.OrdersByDestinationEntryR\x13ordersByDestination\x12)\n" +
+	"\x10duplicate_orders\x18\x06 \x01(\x05R\x0fduplicateOrders\x12T\n" +
+	"\x12orders_by_customer\x18\a \x03(\v2&.store.v1.Report.OrdersByCustomerEntryR\x10ordersByCustomer\x12p\n" +
+	"\x1cduplicate_orders_by_customer\x18\b \x03(\v2/.store.v1.Report.DuplicateOrdersByCustomerEntryR\x19duplicateOrdersByCustomer\x1aO\n" +
+	"\n" +
+	"ItemsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12+\n" +
+	"\x05value\x18\x02 \x01(\v2\x15.store.v1.ItemSummaryR\x05value:\x028\x01\x1aF\n" +
+	"\x18OrdersByDestinationEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\x1aC\n" +
+	"\x15OrdersByCustomerEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x01\x1aL\n" +
+	"\x1eDuplicateOrdersByCustomerEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x05R\x05value:\x028\x012\xad\x02\n" +
 	"\bEventBus\x129\n" +
 	"\aPublish\x12\x18.store.v1.PublishRequest\x1a\x14.store.v1.PublishAck\x12<\n" +
-	"\tSubscribe\x12\x1a.store.v1.SubscribeRequest\x1a\x11.store.v1.Message0\x01B\x1dZ\x1bserver-client/proto/storepbb\x06proto3"
+	"\tSubscribe\x12\x1a.store.v1.SubscribeRequest\x1a\x11.store.v1.Message0\x01\x12V\n" +
+	"\x0fGetReportByDate\x12 .store.v1.GetReportByDateRequest\x1a!.store.v1.GetReportByDateResponse\x12P\n" +
+	"\rGetAllReports\x12\x1e.store.v1.GetAllReportsRequest\x1a\x1f.store.v1.GetAllReportsResponseB\x1dZ\x1bserver-client/proto/storepbb\x06proto3"
 
 var (
 	file_store_proto_rawDescOnce sync.Once
@@ -254,23 +609,44 @@ func file_store_proto_rawDescGZIP() []byte {
 	return file_store_proto_rawDescData
 }
 
-var file_store_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_store_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_store_proto_goTypes = []any{
-	(*PublishRequest)(nil),   // 0: store.v1.PublishRequest
-	(*PublishAck)(nil),       // 1: store.v1.PublishAck
-	(*SubscribeRequest)(nil), // 2: store.v1.SubscribeRequest
-	(*Message)(nil),          // 3: store.v1.Message
+	(*PublishRequest)(nil),          // 0: store.v1.PublishRequest
+	(*PublishAck)(nil),              // 1: store.v1.PublishAck
+	(*SubscribeRequest)(nil),        // 2: store.v1.SubscribeRequest
+	(*Message)(nil),                 // 3: store.v1.Message
+	(*GetReportByDateRequest)(nil),  // 4: store.v1.GetReportByDateRequest
+	(*GetReportByDateResponse)(nil), // 5: store.v1.GetReportByDateResponse
+	(*GetAllReportsRequest)(nil),    // 6: store.v1.GetAllReportsRequest
+	(*GetAllReportsResponse)(nil),   // 7: store.v1.GetAllReportsResponse
+	(*ItemSummary)(nil),             // 8: store.v1.ItemSummary
+	(*Report)(nil),                  // 9: store.v1.Report
+	nil,                             // 10: store.v1.Report.ItemsEntry
+	nil,                             // 11: store.v1.Report.OrdersByDestinationEntry
+	nil,                             // 12: store.v1.Report.OrdersByCustomerEntry
+	nil,                             // 13: store.v1.Report.DuplicateOrdersByCustomerEntry
 }
 var file_store_proto_depIdxs = []int32{
-	0, // 0: store.v1.EventBus.Publish:input_type -> store.v1.PublishRequest
-	2, // 1: store.v1.EventBus.Subscribe:input_type -> store.v1.SubscribeRequest
-	1, // 2: store.v1.EventBus.Publish:output_type -> store.v1.PublishAck
-	3, // 3: store.v1.EventBus.Subscribe:output_type -> store.v1.Message
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	9,  // 0: store.v1.GetReportByDateResponse.report:type_name -> store.v1.Report
+	9,  // 1: store.v1.GetAllReportsResponse.reports:type_name -> store.v1.Report
+	10, // 2: store.v1.Report.items:type_name -> store.v1.Report.ItemsEntry
+	11, // 3: store.v1.Report.orders_by_destination:type_name -> store.v1.Report.OrdersByDestinationEntry
+	12, // 4: store.v1.Report.orders_by_customer:type_name -> store.v1.Report.OrdersByCustomerEntry
+	13, // 5: store.v1.Report.duplicate_orders_by_customer:type_name -> store.v1.Report.DuplicateOrdersByCustomerEntry
+	8,  // 6: store.v1.Report.ItemsEntry.value:type_name -> store.v1.ItemSummary
+	0,  // 7: store.v1.EventBus.Publish:input_type -> store.v1.PublishRequest
+	2,  // 8: store.v1.EventBus.Subscribe:input_type -> store.v1.SubscribeRequest
+	4,  // 9: store.v1.EventBus.GetReportByDate:input_type -> store.v1.GetReportByDateRequest
+	6,  // 10: store.v1.EventBus.GetAllReports:input_type -> store.v1.GetAllReportsRequest
+	1,  // 11: store.v1.EventBus.Publish:output_type -> store.v1.PublishAck
+	3,  // 12: store.v1.EventBus.Subscribe:output_type -> store.v1.Message
+	5,  // 13: store.v1.EventBus.GetReportByDate:output_type -> store.v1.GetReportByDateResponse
+	7,  // 14: store.v1.EventBus.GetAllReports:output_type -> store.v1.GetAllReportsResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_store_proto_init() }
@@ -284,7 +660,7 @@ func file_store_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_store_proto_rawDesc), len(file_store_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

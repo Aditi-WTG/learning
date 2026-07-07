@@ -19,8 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	EventBus_Publish_FullMethodName   = "/store.v1.EventBus/Publish"
-	EventBus_Subscribe_FullMethodName = "/store.v1.EventBus/Subscribe"
+	EventBus_Publish_FullMethodName         = "/store.v1.EventBus/Publish"
+	EventBus_Subscribe_FullMethodName       = "/store.v1.EventBus/Subscribe"
+	EventBus_GetReportByDate_FullMethodName = "/store.v1.EventBus/GetReportByDate"
+	EventBus_GetAllReports_FullMethodName   = "/store.v1.EventBus/GetAllReports"
 )
 
 // EventBusClient is the client API for EventBus service.
@@ -29,6 +31,8 @@ const (
 type EventBusClient interface {
 	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishAck, error)
 	Subscribe(ctx context.Context, in *SubscribeRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Message], error)
+	GetReportByDate(ctx context.Context, in *GetReportByDateRequest, opts ...grpc.CallOption) (*GetReportByDateResponse, error)
+	GetAllReports(ctx context.Context, in *GetAllReportsRequest, opts ...grpc.CallOption) (*GetAllReportsResponse, error)
 }
 
 type eventBusClient struct {
@@ -68,12 +72,34 @@ func (c *eventBusClient) Subscribe(ctx context.Context, in *SubscribeRequest, op
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EventBus_SubscribeClient = grpc.ServerStreamingClient[Message]
 
+func (c *eventBusClient) GetReportByDate(ctx context.Context, in *GetReportByDateRequest, opts ...grpc.CallOption) (*GetReportByDateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetReportByDateResponse)
+	err := c.cc.Invoke(ctx, EventBus_GetReportByDate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *eventBusClient) GetAllReports(ctx context.Context, in *GetAllReportsRequest, opts ...grpc.CallOption) (*GetAllReportsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAllReportsResponse)
+	err := c.cc.Invoke(ctx, EventBus_GetAllReports_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EventBusServer is the server API for EventBus service.
 // All implementations must embed UnimplementedEventBusServer
 // for forward compatibility.
 type EventBusServer interface {
 	Publish(context.Context, *PublishRequest) (*PublishAck, error)
 	Subscribe(*SubscribeRequest, grpc.ServerStreamingServer[Message]) error
+	GetReportByDate(context.Context, *GetReportByDateRequest) (*GetReportByDateResponse, error)
+	GetAllReports(context.Context, *GetAllReportsRequest) (*GetAllReportsResponse, error)
 	mustEmbedUnimplementedEventBusServer()
 }
 
@@ -89,6 +115,12 @@ func (UnimplementedEventBusServer) Publish(context.Context, *PublishRequest) (*P
 }
 func (UnimplementedEventBusServer) Subscribe(*SubscribeRequest, grpc.ServerStreamingServer[Message]) error {
 	return status.Error(codes.Unimplemented, "method Subscribe not implemented")
+}
+func (UnimplementedEventBusServer) GetReportByDate(context.Context, *GetReportByDateRequest) (*GetReportByDateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetReportByDate not implemented")
+}
+func (UnimplementedEventBusServer) GetAllReports(context.Context, *GetAllReportsRequest) (*GetAllReportsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAllReports not implemented")
 }
 func (UnimplementedEventBusServer) mustEmbedUnimplementedEventBusServer() {}
 func (UnimplementedEventBusServer) testEmbeddedByValue()                  {}
@@ -140,6 +172,42 @@ func _EventBus_Subscribe_Handler(srv interface{}, stream grpc.ServerStream) erro
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type EventBus_SubscribeServer = grpc.ServerStreamingServer[Message]
 
+func _EventBus_GetReportByDate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReportByDateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventBusServer).GetReportByDate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventBus_GetReportByDate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventBusServer).GetReportByDate(ctx, req.(*GetReportByDateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EventBus_GetAllReports_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllReportsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EventBusServer).GetAllReports(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EventBus_GetAllReports_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EventBusServer).GetAllReports(ctx, req.(*GetAllReportsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EventBus_ServiceDesc is the grpc.ServiceDesc for EventBus service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -150,6 +218,14 @@ var EventBus_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Publish",
 			Handler:    _EventBus_Publish_Handler,
+		},
+		{
+			MethodName: "GetReportByDate",
+			Handler:    _EventBus_GetReportByDate_Handler,
+		},
+		{
+			MethodName: "GetAllReports",
+			Handler:    _EventBus_GetAllReports_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

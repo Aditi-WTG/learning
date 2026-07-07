@@ -1,7 +1,7 @@
 PROTO_DIR := proto
 OUT_DIR   := pb
 
-.PHONY: proto build server order duplicate reports clean
+.PHONY: proto build server order reports clean
 
 proto:
 	protoc \
@@ -20,9 +20,6 @@ reports:
 	go run ./cmd/client -mode=sub -topic=report.daily
 
 order:
-	go run ./cmd/client -mode=pub -topic=order.created -message='{"orderId":"O1001","customerId":"C001","items":[{"itemId":"I001","quantity":2}],"destination":"Mumbai","date":"2026-07-06"}'
-
-duplicate:
 	go run ./cmd/client -mode=pub -topic=order.created -message='{"orderId":"O1001","customerId":"C001","items":[{"itemId":"I001","quantity":2}],"destination":"Mumbai","date":"2026-07-06"}'
 
 clean:
