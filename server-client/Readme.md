@@ -18,12 +18,6 @@ Current flow:
 
 ## Run
 
-Run all commands from `server-client` folder:
-
-```powershell
-cd c:\git\GitHub\learning\server-client
-```
-
 Terminal 1 (server):
 
 ```powershell

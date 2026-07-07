@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package store.v1;
 
-option go_package = "server-client/proto/storepb";
+option go_package = "server-client/pb/storepb";
 
 service EventBus {
     rpc Publish(PublishRequest) returns (PublishAck);
