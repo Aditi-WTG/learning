@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -48,7 +49,10 @@ func receiveReportMessage(t *testing.T, ch <-chan *storepb.Message) *storepb.Mes
 func TestPublishValidation(t *testing.T) {
 	b := broker.NewBroker(4)
 	a := reporting.NewReportAggregator(testCatalog())
-	svc := NewEventBusService(b, a)
+	svc, err := NewEventBusService(b, a)
+	if err != nil {
+		t.Fatalf("unexpected service init error: %v", err)
+	}
 
 	validOrder := mustMarshalOrder(t, models.Order{
 		OrderID:     "O1",
@@ -80,24 +84,28 @@ func TestPublishValidation(t *testing.T) {
 	}
 }
 
-func TestPublishFailsWhenAggregatorIsNotConfigured(t *testing.T) {
+func TestNewEventBusServiceRequiresAggregator(t *testing.T) {
 	b := broker.NewBroker(4)
-	svc := NewEventBusService(b, nil)
 
-	_, err := svc.Publish(context.Background(), &storepb.PublishRequest{
-		Topic: topicOrderCreated,
-		Body:  `{"orderId":"O1","customerId":"C1","items":[{"itemId":"I001","quantity":1}],"destination":"Bangalore","date":"2026-07-07"}`,
-	})
-
+	svc, err := NewEventBusService(b, nil)
+	if err == nil {
+		t.Fatal("expected constructor error for nil aggregator")
+	}
 	if status.Code(err) != codes.FailedPrecondition {
 		t.Fatalf("expected FailedPrecondition, got %v (err=%v)", status.Code(err), err)
+	}
+	if svc != nil {
+		t.Fatal("expected nil service when constructor fails")
 	}
 }
 
 func TestPublishSuccessEmitsDailyReportEvent(t *testing.T) {
 	b := broker.NewBroker(4)
 	a := reporting.NewReportAggregator(testCatalog())
-	svc := NewEventBusService(b, a)
+	svc, err := NewEventBusService(b, a)
+	if err != nil {
+		t.Fatalf("unexpected service init error: %v", err)
+	}
 
 	reportSub, err := b.AddSubscriber(topicReportDaily)
 	if err != nil {
@@ -120,6 +128,9 @@ func TestPublishSuccessEmitsDailyReportEvent(t *testing.T) {
 	}
 	if strings.TrimSpace(ack.GetId()) == "" {
 		t.Fatal("expected non-empty ack id")
+	}
+	if !regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`).MatchString(ack.GetId()) {
+		t.Fatalf("expected UUIDv4 ack id, got %s", ack.GetId())
 	}
 
 	msg := receiveReportMessage(t, reportSub)
@@ -148,9 +159,12 @@ func TestPublishSuccessEmitsDailyReportEvent(t *testing.T) {
 func TestGetReportByDate(t *testing.T) {
 	b := broker.NewBroker(4)
 	a := reporting.NewReportAggregator(testCatalog())
-	svc := NewEventBusService(b, a)
+	svc, err := NewEventBusService(b, a)
+	if err != nil {
+		t.Fatalf("unexpected service init error: %v", err)
+	}
 
-	_, err := svc.GetReportByDate(context.Background(), &storepb.GetReportByDateRequest{})
+	_, err = svc.GetReportByDate(context.Background(), &storepb.GetReportByDateRequest{})
 	if status.Code(err) != codes.InvalidArgument {
 		t.Fatalf("expected InvalidArgument for empty date, got %v", status.Code(err))
 	}
@@ -189,7 +203,10 @@ func TestGetReportByDate(t *testing.T) {
 func TestGetAllReports(t *testing.T) {
 	b := broker.NewBroker(4)
 	a := reporting.NewReportAggregator(testCatalog())
-	svc := NewEventBusService(b, a)
+	svc, err := NewEventBusService(b, a)
+	if err != nil {
+		t.Fatalf("unexpected service init error: %v", err)
+	}
 
 	emptyResp, err := svc.GetAllReports(context.Background(), &storepb.GetAllReportsRequest{})
 	if err != nil {
@@ -221,20 +238,5 @@ func TestGetAllReports(t *testing.T) {
 
 	if resp.GetReports()[0].GetDate() != "2026-07-10" || resp.GetReports()[1].GetDate() != "2026-07-11" {
 		t.Fatalf("expected sorted dates [2026-07-10, 2026-07-11], got [%s, %s]", resp.GetReports()[0].GetDate(), resp.GetReports()[1].GetDate())
-	}
-}
-
-func TestReportQueriesFailWhenAggregatorIsNotConfigured(t *testing.T) {
-	b := broker.NewBroker(4)
-	svc := NewEventBusService(b, nil)
-
-	_, err := svc.GetReportByDate(context.Background(), &storepb.GetReportByDateRequest{Date: "2026-07-10"})
-	if status.Code(err) != codes.FailedPrecondition {
-		t.Fatalf("expected FailedPrecondition, got %v", status.Code(err))
-	}
-
-	_, err = svc.GetAllReports(context.Background(), &storepb.GetAllReportsRequest{})
-	if status.Code(err) != codes.FailedPrecondition {
-		t.Fatalf("expected FailedPrecondition, got %v", status.Code(err))
 	}
 }

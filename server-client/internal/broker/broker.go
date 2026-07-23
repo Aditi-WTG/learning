@@ -27,7 +27,7 @@ func NewBroker(bufferSize int) *Broker {
 func (b *Broker) AddSubscriber(topic string) (chan *storepb.Message, error) {
 	topic = strings.TrimSpace(topic)
 	if topic == "" {
-		return nil, errors.New("topic is required")
+		return nil, errors.New("Topic is required")
 	}
 
 	ch := make(chan *storepb.Message, b.bufferSize)

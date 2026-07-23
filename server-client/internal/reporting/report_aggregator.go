@@ -110,7 +110,6 @@ func (a *ReportAggregator) addOrderToReport(report *models.ShippingReport, order
 }
 
 func (a *ReportAggregator) recordDuplicateOrder(report *models.ShippingReport, order models.Order) {
-	report.TotalOrders++
 	report.DuplicateOrders++
 	report.DuplicateOrdersByCustomer[order.CustomerID]++
 }

@@ -26,7 +26,10 @@ func TestEventBusEndToEnd(t *testing.T) {
 
 	b := broker.NewBroker(16)
 	a := reporting.NewReportAggregator(catalog)
-	svc := NewEventBusService(b, a)
+	svc, err := NewEventBusService(b, a)
+	if err != nil {
+		t.Fatalf("unexpected service init error: %v", err)
+	}
 
 	listener := bufconn.Listen(bufSize)
 	grpcServer := grpc.NewServer()

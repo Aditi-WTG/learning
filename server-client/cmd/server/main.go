@@ -1,16 +1,20 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"log"
 	"net"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"server-client/internal/broker"
 	"server-client/internal/models"
 	"server-client/internal/reporting"
 	"server-client/internal/service"
 	storepb "server-client/pb"
+	"syscall"
 
 	"google.golang.org/grpc"
 )
@@ -19,7 +23,7 @@ func main() {
 	lis, err := net.Listen("tcp", ":50053")
 
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatalf("Failed to listen: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -27,19 +31,38 @@ func main() {
 	b := broker.NewBroker(16)
 	catalog, err := loadCatalog()
 	if err != nil {
-		log.Fatalf("failed to load catalog: %v", err)
+		log.Fatalf("Failed to load catalog: %v", err)
 	}
 
 	aggregator := reporting.NewReportAggregator(catalog)
-	svc := service.NewEventBusService(b, aggregator)
+	svc, err := service.NewEventBusService(b, aggregator)
+	if err != nil {
+		log.Fatalf("Failed to initialize event bus service: %v", err)
+	}
 
 	storepb.RegisterEventBusServer(grpcServer, svc)
 
 	log.Println("server listening on :50053")
 
-	err = grpcServer.Serve(lis)
-	if err != nil {
-		log.Fatalf("failed to server: %v", err)
+	shutdownCtx, shutdown := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer shutdown()
+
+	serveErr := make(chan error, 1)
+	go func() {
+		serveErr <- grpcServer.Serve(lis)
+	}()
+
+	select {
+	case <-shutdownCtx.Done():
+		log.Println("shutdown signal received, stopping server")
+		grpcServer.GracefulStop()
+		if err := <-serveErr; err != nil {
+			log.Fatalf("Failed to stop server cleanly: %v", err)
+		}
+	case err := <-serveErr:
+		if err != nil {
+			log.Fatalf("Failed to serve: %v", err)
+		}
 	}
 }
 
@@ -55,7 +78,7 @@ func loadCatalog() ([]models.Item, error) {
 	}
 
 	if len(catalog) == 0 {
-		return nil, os.ErrInvalid
+		return nil, errors.New("Catalog is empty")
 	}
 
 	return catalog, nil

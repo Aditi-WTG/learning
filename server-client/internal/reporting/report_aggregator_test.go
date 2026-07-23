@@ -46,8 +46,8 @@ func TestProcessOrderAndDuplicate(t *testing.T) {
 		t.Fatalf("unexpected error for duplicate order: %v", err)
 	}
 
-	if report.TotalOrders != 2 {
-		t.Fatalf("expected TotalOrders=2, got %d", report.TotalOrders)
+	if report.TotalOrders != 1 {
+		t.Fatalf("expected TotalOrders=1 after duplicate order, got %d", report.TotalOrders)
 	}
 	if report.DuplicateOrders != 1 {
 		t.Fatalf("expected DuplicateOrders=1, got %d", report.DuplicateOrders)

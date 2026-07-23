@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	mode := flag.String("mode", "", "pub or sub")
+	mode := flag.String("mode", "", "pub, sub, report, or report-all")
 	topic := flag.String("topic", "", "topic name")
 	date := flag.String("date", "", "report date in YYYY-MM-DD (for report mode)")
 	addr := flag.String("addr", "localhost:50053", "server address")
@@ -22,18 +22,18 @@ func main() {
 	flag.Parse()
 
 	if *mode == "" {
-		log.Fatal("flag - mode is required")
+		log.Fatal("Flag - mode is required")
 	}
 
 	if *topic == "" && *mode != "report" && *mode != "report-all" {
-		log.Fatal("flag - topic is required")
+		log.Fatal("Flag - topic is required")
 	}
 
 	cred := insecure.NewCredentials()
 
 	conn, err := grpc.NewClient(*addr, grpc.WithTransportCredentials(cred))
 	if err != nil {
-		log.Fatalf("failed to connect: %v", err)
+		log.Fatalf("Failed to connect: %v", err)
 	}
 
 	defer conn.Close()
@@ -50,13 +50,13 @@ func main() {
 	case "report-all":
 		getAllReports(client)
 	default:
-		log.Fatalf("invalid mode: %s", *mode)
+		log.Fatalf("Invalid mode: %s (supported: pub, sub, report, report-all)", *mode)
 	}
 }
 
 func publish(client storepb.EventBusClient, topic string, message string) {
 	if message == "" {
-		log.Fatal("flag - message is required")
+		log.Fatal("Flag - message is required")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -69,7 +69,7 @@ func publish(client storepb.EventBusClient, topic string, message string) {
 
 	resp, err := client.Publish(ctx, req)
 	if err != nil {
-		log.Fatalf("publish failed: %v", err)
+		log.Fatalf("Publish failed: %v", err)
 	}
 
 	log.Printf("published message with ID: %s\n", resp.Id)
@@ -81,7 +81,7 @@ func subscribe(client storepb.EventBusClient, topic string) {
 
 	stream, err := client.Subscribe(ctx, &storepb.SubscribeRequest{Topic: topic})
 	if err != nil {
-		log.Fatalf("subscribe failed: %v", err)
+		log.Fatalf("Subscribe failed: %v", err)
 	}
 
 	log.Printf("subscribed to topic: %s\n", topic)
@@ -93,7 +93,7 @@ func subscribe(client storepb.EventBusClient, topic string) {
 			return
 		}
 		if err != nil {
-			log.Fatalf("receive error: %v", err)
+			log.Fatalf("Receive error: %v", err)
 		}
 
 		log.Printf("Topic: %s, Message: %s\n", msg.Topic, msg.Body)
@@ -102,7 +102,7 @@ func subscribe(client storepb.EventBusClient, topic string) {
 
 func getReportByDate(client storepb.EventBusClient, date string) {
 	if date == "" {
-		log.Fatal("flag - date is required for report mode")
+		log.Fatal("Flag - date is required for report mode")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -110,12 +110,12 @@ func getReportByDate(client storepb.EventBusClient, date string) {
 
 	resp, err := client.GetReportByDate(ctx, &storepb.GetReportByDateRequest{Date: date})
 	if err != nil {
-		log.Fatalf("get report failed: %v", err)
+		log.Fatalf("Get report failed: %v", err)
 	}
 
 	formatted, err := json.MarshalIndent(resp.GetReport(), "", "  ")
 	if err != nil {
-		log.Fatalf("failed to format report: %v", err)
+		log.Fatalf("Failed to format report: %v", err)
 	}
 
 	log.Println(string(formatted))
@@ -127,12 +127,12 @@ func getAllReports(client storepb.EventBusClient) {
 
 	resp, err := client.GetAllReports(ctx, &storepb.GetAllReportsRequest{})
 	if err != nil {
-		log.Fatalf("get all reports failed: %v", err)
+		log.Fatalf("Get all reports failed: %v", err)
 	}
 
 	formatted, err := json.MarshalIndent(resp.GetReports(), "", "  ")
 	if err != nil {
-		log.Fatalf("failed to format reports: %v", err)
+		log.Fatalf("Failed to format reports: %v", err)
 	}
 
 	log.Println(string(formatted))

@@ -3,14 +3,13 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"server-client/internal/broker"
 	"server-client/internal/models"
 	"server-client/internal/reporting"
 	storepb "server-client/pb"
 	"strings"
-	"time"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -27,8 +26,12 @@ type EventBusService struct {
 	aggregator *reporting.ReportAggregator
 }
 
-func NewEventBusService(b *broker.Broker, aggregator *reporting.ReportAggregator) *EventBusService {
-	return &EventBusService{b: b, aggregator: aggregator}
+func NewEventBusService(b *broker.Broker, aggregator *reporting.ReportAggregator) (*EventBusService, error) {
+	if aggregator == nil {
+		return nil, status.Error(codes.FailedPrecondition, "Report aggregator is not configured")
+	}
+
+	return &EventBusService{b: b, aggregator: aggregator}, nil
 }
 
 func (s *EventBusService) Publish(ctx context.Context, req *storepb.PublishRequest) (*storepb.PublishAck, error) {
@@ -36,31 +39,27 @@ func (s *EventBusService) Publish(ctx context.Context, req *storepb.PublishReque
 	body := strings.TrimSpace(req.GetBody())
 
 	if topic == "" {
-		return nil, status.Error(codes.InvalidArgument, "topic is required")
+		return nil, status.Error(codes.InvalidArgument, "Topic is required")
 	}
 
 	if body == "" {
-		return nil, status.Error(codes.InvalidArgument, "body is required")
+		return nil, status.Error(codes.InvalidArgument, "Body is required")
 	}
 
-	id := fmt.Sprintf("%d", time.Now().UnixNano())
+	id := uuid.NewString()
 
 	if topic != topicOrderCreated {
-		return nil, status.Errorf(codes.InvalidArgument, "unsupported topic: %s", topic)
-	}
-
-	if s.aggregator == nil {
-		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
+		return nil, status.Errorf(codes.InvalidArgument, "Unsupported topic: %s", topic)
 	}
 
 	var order models.Order
 	if err := json.Unmarshal([]byte(body), &order); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid %s payload: %v", topicOrderCreated, err)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid %s payload: %v", topicOrderCreated, err)
 	}
 
 	report, err := s.aggregator.ProcessOrder(order)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid order: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid order: %v", err)
 	}
 
 	if err := s.publishDailyReportEvent(id, report); err != nil {
@@ -74,13 +73,13 @@ func (s *EventBusService) Subscribe(req *storepb.SubscribeRequest, stream grpc.S
 	topic := strings.TrimSpace(req.Topic)
 
 	if topic == "" {
-		return status.Error(codes.InvalidArgument, "topic is required")
+		return status.Error(codes.InvalidArgument, "Topic is required")
 	}
 
 	ch, err := s.b.AddSubscriber(topic)
 
 	if err != nil {
-		return status.Errorf(codes.Internal, "failed to subscribe: %v", err)
+		return status.Errorf(codes.Internal, "Failed to subscribe: %v", err)
 	}
 
 	defer s.b.RemoveSubscriber(topic, ch)
@@ -103,28 +102,20 @@ func (s *EventBusService) Subscribe(req *storepb.SubscribeRequest, stream grpc.S
 }
 
 func (s *EventBusService) GetReportByDate(ctx context.Context, req *storepb.GetReportByDateRequest) (*storepb.GetReportByDateResponse, error) {
-	if s.aggregator == nil {
-		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
-	}
-
 	date := strings.TrimSpace(req.GetDate())
 	if date == "" {
-		return nil, status.Error(codes.InvalidArgument, "date is required")
+		return nil, status.Error(codes.InvalidArgument, "Date is required")
 	}
 
 	report, ok := s.aggregator.Snapshot(date)
 	if !ok {
-		return nil, status.Error(codes.NotFound, "report not found for date")
+		return nil, status.Error(codes.NotFound, "Report not found for date")
 	}
 
 	return &storepb.GetReportByDateResponse{Report: toProtoReport(report)}, nil
 }
 
 func (s *EventBusService) GetAllReports(ctx context.Context, req *storepb.GetAllReportsRequest) (*storepb.GetAllReportsResponse, error) {
-	if s.aggregator == nil {
-		return nil, status.Error(codes.FailedPrecondition, "report aggregator is not configured")
-	}
-
 	all := s.aggregator.SnapshotAll()
 	reports := make([]*storepb.Report, 0, len(all))
 	for _, report := range all {
@@ -137,7 +128,7 @@ func (s *EventBusService) GetAllReports(ctx context.Context, req *storepb.GetAll
 func (s *EventBusService) publishDailyReportEvent(baseID string, report models.ShippingReport) error {
 	reportBody, err := json.Marshal(report)
 	if err != nil {
-		return status.Errorf(codes.Internal, "failed to serialize daily report: %v", err)
+		return status.Errorf(codes.Internal, "Failed to serialize daily report: %v", err)
 	}
 
 	s.b.Publish(topicReportDaily, &storepb.Message{
